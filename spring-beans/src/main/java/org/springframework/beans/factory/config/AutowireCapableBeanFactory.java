@@ -67,6 +67,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
+	 *
+	 * 默认值，未激活Autowiring，需要手动指定依赖注入对象
 	 */
 	int AUTOWIRE_NO = 0;
 
@@ -76,6 +78,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
+	 *
+	 * 根据被注入属性的名称作为Bean名称进行依赖查找，并将对象设置到该属性
 	 */
 	int AUTOWIRE_BY_NAME = 1;
 
@@ -85,6 +89,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
+	 *
+	 * 根据被注入属性的类型作为Bean类型进行依赖查找，并将对象设置到该属性
 	 */
 	int AUTOWIRE_BY_TYPE = 2;
 
@@ -93,6 +99,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * can be satisfied (involves resolving the appropriate constructor).
 	 * @see #createBean
 	 * @see #autowire
+	 *
+	 * 特殊的byType，用于构造器参数
 	 */
 	int AUTOWIRE_CONSTRUCTOR = 3;
 
@@ -392,6 +400,10 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	 * @throws BeansException if dependency resolution failed for any other reason
 	 * @since 2.5
 	 * @see DependencyDescriptor
+	 *
+	 * DependencyDescriptor表示依赖，需要给这个依赖注入值，这个依赖可能是field/method/constructor
+	 * requestingBeanName表示当前正在进行依赖注入的是哪个bean
+	 * autowiredBeanNames用来记录所匹配的用来注入给当前依赖的beanName，会用来进行缓存
 	 */
 	@Nullable
 	Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,

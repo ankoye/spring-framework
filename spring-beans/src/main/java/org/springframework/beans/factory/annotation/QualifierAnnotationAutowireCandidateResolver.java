@@ -143,7 +143,11 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 */
 	@Override
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 先交给GenericTypeAwareAutowireCandidateResolver进行验证bd和descriptor是否匹配
+		// 先进行其他严重，再进行Qualifiers验证
 		boolean match = super.isAutowireCandidate(bdHolder, descriptor);
+		// 如果某个beanDefinition和descriptor匹配，那么再判断一下是否使用了@Qualifier注解
+		// 如果使用了则要继续判断当前bd的beanName是否和@Qualifier注解所指定的名字相等
 		if (match) {
 			match = checkQualifiers(bdHolder, descriptor.getAnnotations());
 			if (match) {
@@ -168,17 +172,22 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 		}
 		SimpleTypeConverter typeConverter = new SimpleTypeConverter();
 		for (Annotation annotation : annotationsToSearch) {
+			// 注解的类型，可以是
 			Class<? extends Annotation> type = annotation.annotationType();
 			boolean checkMeta = true;
 			boolean fallbackToMeta = false;
+			// 该注解是不是Qualifier注解, 或者是不是“继承了”Qualifier注解
 			if (isQualifier(type)) {
+				// 检查当前@Qualifier注解中配置的值和bdHolder是否匹配，如果不匹配， fallbackToMeta=true， checkMeta=true
 				if (!checkQualifier(bdHolder, annotation, typeConverter)) {
 					fallbackToMeta = true;
 				}
 				else {
+					// 如果匹配了 fallbackToMeta = false, checkMeta = false
 					checkMeta = false;
 				}
 			}
+			// 如果本注解没有匹配，那么再检查父注解上的Qulifier注解是否匹配
 			if (checkMeta) {
 				boolean foundMeta = false;
 				for (Annotation metaAnn : type.getAnnotations()) {
@@ -219,9 +228,11 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	protected boolean checkQualifier(
 			BeanDefinitionHolder bdHolder, Annotation annotation, TypeConverter typeConverter) {
 
+		// 注解的type
 		Class<? extends Annotation> type = annotation.annotationType();
 		RootBeanDefinition bd = (RootBeanDefinition) bdHolder.getBeanDefinition();
 
+		// bd上定义的qualifier
 		AutowireCandidateQualifier qualifier = bd.getQualifier(type.getName());
 		if (qualifier == null) {
 			qualifier = bd.getQualifier(ClassUtils.getShortName(type));
@@ -268,9 +279,11 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 		}
 		for (Map.Entry<String, Object> entry : attributes.entrySet()) {
 			String attributeName = entry.getKey();
+			// 注解上表示期望的值
 			Object expectedValue = entry.getValue();
 			Object actualValue = null;
 			// Check qualifier first
+			// bd上定义的qualifier的表示真实的值
 			if (qualifier != null) {
 				actualValue = qualifier.getAttribute(attributeName);
 			}
@@ -290,6 +303,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 			if (actualValue != null) {
 				actualValue = typeConverter.convertIfNecessary(actualValue, expectedValue.getClass());
 			}
+			// 是否匹配
 			if (!expectedValue.equals(actualValue)) {
 				return false;
 			}
@@ -346,10 +360,12 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	@Override
 	@Nullable
 	public Object getSuggestedValue(DependencyDescriptor descriptor) {
+		// 拿到field上的注解，看是否配置了@Value
 		Object value = findValue(descriptor.getAnnotations());
 		if (value == null) {
 			MethodParameter methodParam = descriptor.getMethodParameter();
 			if (methodParam != null) {
+				// 拿到set方法上的@Value注解
 				value = findValue(methodParam.getMethodAnnotations());
 			}
 		}
@@ -362,9 +378,11 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	@Nullable
 	protected Object findValue(Annotation[] annotationsToSearch) {
 		if (annotationsToSearch.length > 0) {   // qualifier annotations have to be local
+			// 得到@Value注解上的属性
 			AnnotationAttributes attr = AnnotatedElementUtils.getMergedAnnotationAttributes(
 					AnnotatedElementUtils.forAnnotations(annotationsToSearch), this.valueAnnotationType);
 			if (attr != null) {
+				// @Value注解中所定义的值
 				return extractValue(attr);
 			}
 		}

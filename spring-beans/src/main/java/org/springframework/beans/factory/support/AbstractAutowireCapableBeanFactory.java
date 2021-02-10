@@ -1452,11 +1452,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 是否在BeanDefinition中设置了属性值
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		//  autowire属性
+		//  处理xml配置中的autowire属性
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
-			// by_name是根据根据属性名字找bean
-			// by_type是根据属性所对应的set方法的参数类型找bean
+			// byName是根据属性所对应的set方法名字找bean
+			// byType是根据属性所对应的set方法的参数类型找bean
 			// 找到bean之后都要调用set方法进行注入
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
@@ -1467,10 +1467,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
-			pvs = newPvs;
-			// 总结一下，其实就是Spring自动的根据某个类中的set方法来找bean，byName就是根据某个set方法所对应的属性名去找bean
-			// byType，就是根据某个set方法的参数类型去找bean
 			// 注意，执行完这里的代码之后，这是把属性以及找到的值存在了pvs里面，并没有完成反射赋值
+			pvs = newPvs;
 		}
 
 		// 执行完了Spring的自动注入之后，就开始解析@Autowired，这里叫做实例化回调
@@ -1617,10 +1615,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
 		// 对类里所有的属性进行过滤,确定哪些属性是需要进行自动装配的
 		for (PropertyDescriptor pd : pds) {
-			// 属性有set方法，并且
-			// 没有通过DependencyCheck排除，并且
-			// 没有在BeanDefinition中给该属性赋值，并且
-			// 属性的类型不是简单类型
+			// 属性有set方法，并且没有通过DependencyCheck排除，
+			// 并且没有在BeanDefinition中给该属性赋值，
+			// 并且属性的类型不是简单类型
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
 				result.add(pd.getName());

@@ -62,10 +62,12 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 
 	@Override
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 先调用SimpleAutowireCandidateResolver进行验证是否匹配
 		if (!super.isAutowireCandidate(bdHolder, descriptor)) {
 			// If explicitly false, do not proceed with any other checks...
 			return false;
 		}
+		// 如果不匹配则进行泛型匹配
 		return checkGenericTypeMatch(bdHolder, descriptor);
 	}
 
@@ -74,6 +76,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 	 * candidate bean definition.
 	 */
 	protected boolean checkGenericTypeMatch(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 这里得到就是泛型对应的类型
 		ResolvableType dependencyType = descriptor.getResolvableType();
 		if (dependencyType.getType() instanceof Class) {
 			// No generic type -> we know it's a Class type-match, so no need to check again.
@@ -91,6 +94,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 			if (targetType == null) {
 				cacheType = true;
 				// First, check factory method return type, if applicable
+				// 首先，检查当前rbd是不是用factoryMethod，如果是则验证factoryMethod的返回类型和descriptor是否匹配，如果匹配则返回该类型
 				targetType = getReturnTypeForFactoryMethod(rbd, descriptor);
 				if (targetType == null) {
 					RootBeanDefinition dbd = getResolvedDecoratedDefinition(rbd);
@@ -106,6 +110,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 
 		if (targetType == null) {
 			// Regular case: straight bean instance, with BeanFactory available.
+			// 正常情况，得到beandefinition对应的beanType
 			if (this.beanFactory != null) {
 				Class<?> beanType = this.beanFactory.getType(bdHolder.getBeanName());
 				if (beanType != null) {
@@ -121,7 +126,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 				}
 			}
 		}
-
+		// 不知道beandefinition的targetType，直接返回true，交给其他Resolver去匹配
 		if (targetType == null) {
 			return true;
 		}
@@ -136,6 +141,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 			return true;
 		}
 		// Full check for complex generic type match...
+		// dependencyType是泛型的真实类型，targetType是筛选出来的某个bean的类型
 		return dependencyType.isAssignableFrom(targetType);
 	}
 

@@ -46,6 +46,8 @@ import org.springframework.util.ObjectUtils;
  * Wraps a constructor parameter, a method parameter or a field,
  * allowing unified access to their metadata.
  *
+ * 用来描述一个需要被注入的依赖，包装了构造方法参数，set方法参数，字段，可以通过DependencyDescriptor来方法这些参数的元数据
+ * DependencyDescriptor继承了InjectionPoint，表示一个注入点
  * @author Juergen Hoeller
  * @since 2.5
  */
@@ -272,7 +274,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 	 */
 	public Object resolveCandidate(String beanName, Class<?> requiredType, BeanFactory beanFactory)
 			throws BeansException {
-
+		// 创建Bean对象
 		return beanFactory.getBean(beanName);
 	}
 

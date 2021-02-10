@@ -71,6 +71,7 @@ public class InjectionMetadata {
 	private final Collection<InjectedElement> injectedElements;
 
 	@Nullable
+	/** 存的某个类的所有的注入点 */
 	private volatile Set<InjectedElement> checkedElements;
 
 
@@ -102,11 +103,13 @@ public class InjectionMetadata {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<>(this.injectedElements.size());
 		for (InjectedElement element : this.injectedElements) {
 			Member member = element.getMember();
+			// 如果某个Member存在于BeanDefinition的externallyManagedConfigMembers中，那么这个Member不会被自动注入
 			if (!beanDefinition.isExternallyManagedConfigMember(member)) {
 				beanDefinition.registerExternallyManagedConfigMember(member);
 				checkedElements.add(element);
 			}
 		}
+		// checkedElements表示哪些注入点经过了!isExternallyManagedConfigMember验证，保存了需要Spring内部处理的注入点
 		this.checkedElements = checkedElements;
 	}
 
@@ -115,7 +118,9 @@ public class InjectionMetadata {
 		Collection<InjectedElement> elementsToIterate =
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
+			// 遍历每个能够注入的属性，进行注入
 			for (InjectedElement element : elementsToIterate) {
+				// element可能是Method，也可能是Field
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -165,7 +170,7 @@ public class InjectionMetadata {
 	 * A single injected element.
 	 */
 	public abstract static class InjectedElement {
-
+		/** 方法，属性 */
 		protected final Member member;
 
 		protected final boolean isField;
@@ -221,17 +226,20 @@ public class InjectionMetadata {
 		 */
 		protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
 				throws Throwable {
-
+			// 如果是属性，则反射赋值
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
 			else {
+				// 检查当前的属性是不是通过by_name和by_type来注入的
 				if (checkPropertySkipping(pvs)) {
 					return;
 				}
 				try {
+					// 如果是方法，则通过方法赋值
+					// 这里的方法并不是一定要setXX方法
 					Method method = (Method) this.member;
 					ReflectionUtils.makeAccessible(method);
 					method.invoke(target, getResourceToInject(target, requestingBeanName));
