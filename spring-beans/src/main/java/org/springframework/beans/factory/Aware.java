@@ -31,6 +31,10 @@ package org.springframework.beans.factory;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
+ *
+ * 通过这个接口，可以获取spring的一些对象
+ * 例：ApplicationContextAware，可以获取到applicationContext
+ * 在spring bean创建时通过BeanPostProcessor进行设置
  */
 public interface Aware {
 

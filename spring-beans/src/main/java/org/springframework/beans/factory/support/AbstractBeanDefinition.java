@@ -139,6 +139,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	@Nullable
+	/** 通过asm技术分析并没有创建Class对象，所以为object类型，值可能为String或者Class类型 */
 	private volatile Object beanClass;
 
 	@Nullable

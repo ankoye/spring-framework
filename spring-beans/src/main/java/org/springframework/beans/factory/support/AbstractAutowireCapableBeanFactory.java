@@ -627,9 +627,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 对象已经暴露出去了
 		Object exposedObject = bean;
 		try {
-			// 3、填充属性 @Autowired
+			// 3、填充属性 @Autowired，和进行实例化后回调
 			populateBean(beanName, mbd, instanceWrapper);
-			// 4、初始化 和 BeanPostProcessor 正常AOP  BeanPostProcessor
+			// 4、初始化 和 BeanPostProcessor 正常AOP
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
