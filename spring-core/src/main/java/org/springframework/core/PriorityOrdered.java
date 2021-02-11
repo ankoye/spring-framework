@@ -43,6 +43,8 @@ package org.springframework.core;
  * @since 2.5
  * @see org.springframework.beans.factory.config.PropertyOverrideConfigurer
  * @see org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
+ *
+ * 给beanPostProcessor排序，先按PriorityOrdered后按Ordered排序
  */
 public interface PriorityOrdered extends Ordered {
 }

@@ -121,10 +121,12 @@ public class EventListenerMethodProcessor
 	public void afterSingletonsInstantiated() {
 		ConfigurableListableBeanFactory beanFactory = this.beanFactory;
 		Assert.state(this.beanFactory != null, "No ConfigurableListableBeanFactory set");
+		// 遍历所有的Bean，解析Bean中的@EventListener注解
 		String[] beanNames = beanFactory.getBeanNamesForType(Object.class);
 		for (String beanName : beanNames) {
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				Class<?> type = null;
+				// 可能进行了AOP，所以可能得到的是一个代理对象，这里获取bean的原始类型
 				try {
 					type = AutoProxyUtils.determineTargetClass(beanFactory, beanName);
 				}
@@ -150,6 +152,7 @@ public class EventListenerMethodProcessor
 							}
 						}
 					}
+					// 处理该Bean
 					try {
 						processBean(beanName, type);
 					}
@@ -167,6 +170,7 @@ public class EventListenerMethodProcessor
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
 				!isSpringContainerClass(targetType)) {
 
+			// 获取当前Bean中，加了@EventListener注解的方法
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
@@ -188,6 +192,7 @@ public class EventListenerMethodProcessor
 			}
 			else {
 				// Non-empty set of methods
+				// 把加了@EventListener注解的方法封装为ApplicationListener，并添加到ApplicationContext中
 				ConfigurableApplicationContext context = this.applicationContext;
 				Assert.state(context != null, "No ApplicationContext set");
 				List<EventListenerFactory> factories = this.eventListenerFactories;

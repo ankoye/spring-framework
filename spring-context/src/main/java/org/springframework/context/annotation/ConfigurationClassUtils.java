@@ -89,6 +89,8 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
+		// 如果是AnnotatedBeanDefinition，那么就直接获取Metadata
+		// 如果是其他的，那么则根据类解析出来Metadata
 		AnnotationMetadata metadata;
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
@@ -121,14 +123,18 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// 获取Configuration注解的属性信息，配置类分两种，被@Configuration标记的配置类为full,其他的配置类为lite,full的配置类会生成代理对象
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// 注意，并不是没有Configuration注解当前BeanDefinition就不是一个配置类
+		// 注意isConfigurationCandidate方法，会检查是否存在@Component， @ComponentScan，@Import，@ImportResource，@Bean注解
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
+			// 如果没有Configuration注解信息，则返回false，表示不是一个配置类
 			return false;
 		}
 

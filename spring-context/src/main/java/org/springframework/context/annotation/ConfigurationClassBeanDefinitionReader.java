@@ -146,6 +146,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 当前配置类是不是通过@Import注解导入进来的，如果是则解析该类上面的比如@Scope,@Lazy这些注解信息
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
@@ -153,7 +154,9 @@ class ConfigurationClassBeanDefinitionReader {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+		// 从配置类中Import进来的资源文件中加载BeanDefinition，比如xml文件
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		// 调用ImportBeanDefinitionRegistrar对象的registerBeanDefinitions方法加载BeanDefinition
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 

@@ -61,6 +61,8 @@ import org.springframework.lang.Nullable;
  * @see ClassPathXmlApplicationContext
  * @see FileSystemXmlApplicationContext
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ *
+ * 可以重复刷新
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
