@@ -37,13 +37,20 @@ import org.springframework.util.ObjectUtils;
 abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 	protected TransactionAttributeSourcePointcut() {
+		// 类过滤，判断类上是否存在@Transactional注解
 		setClassFilter(new TransactionAttributeSourceClassFilter());
 	}
 
-
+	/**
+	 * 某个类或方法上是否存在@Transactional注解
+	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
+		// AnnotationTransactionAttributeSource
 		TransactionAttributeSource tas = getTransactionAttributeSource();
+		// 某个类或方法上是否存在@Transactional注解
+		// 调用AnnotationTransactionAttributeSource的父类中的getTransactionAttribute()方法
+		// 判断是否存在@Transactional注解，获取到该注解的信息，不等于null则匹配
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 	}
 
@@ -91,7 +98,9 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 					PersistenceExceptionTranslator.class.isAssignableFrom(clazz)) {
 				return false;
 			}
+			// 获取到AnnotationTransactionAttributeSource对象
 			TransactionAttributeSource tas = getTransactionAttributeSource();
+			// 类上是否存在@Transactional注解
 			return (tas == null || tas.isCandidateClass(clazz));
 		}
 	}

@@ -183,22 +183,28 @@ public abstract class ClassUtils {
 	 * ClassLoader isn't accessible)
 	 * @see Thread#getContextClassLoader()
 	 * @see ClassLoader#getSystemClassLoader()
+	 *
+	 * 先取当前线程对应的classloader
+	 * 再取ClassUtils类的classloader
+	 * 最后去系统指定的classloader
 	 */
 	@Nullable
 	public static ClassLoader getDefaultClassLoader() {
 		ClassLoader cl = null;
 		try {
+			// AppClassLoader
 			cl = Thread.currentThread().getContextClassLoader();
 		}
 		catch (Throwable ex) {
 			// Cannot access thread context ClassLoader - falling back...
 		}
-		if (cl == null) {
+		if (cl == null) { // Bootstrap
 			// No thread context class loader -> use class loader of this class.
 			cl = ClassUtils.class.getClassLoader();
 			if (cl == null) {
 				// getClassLoader() returning null indicates the bootstrap ClassLoader
 				try {
+					// AppClassLoader
 					cl = ClassLoader.getSystemClassLoader();
 				}
 				catch (Throwable ex) {
@@ -256,6 +262,7 @@ public abstract class ClassUtils {
 		}
 
 		// "java.lang.String[]" style arrays
+		// 需要加载的如果是"java.lang.String[]",那么则返回"[Ljava.lang.String;"
 		if (name.endsWith(ARRAY_SUFFIX)) {
 			String elementClassName = name.substring(0, name.length() - ARRAY_SUFFIX.length());
 			Class<?> elementClass = forName(elementClassName, classLoader);

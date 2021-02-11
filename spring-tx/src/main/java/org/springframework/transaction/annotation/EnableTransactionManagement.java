@@ -173,6 +173,8 @@ public @interface EnableTransactionManagement {
 	 * {@code @Async} annotation will be upgraded to subclass proxying at the same
 	 * time. This approach has no negative impact in practice unless one is explicitly
 	 * expecting one type of proxy vs another, e.g. in tests.
+	 *
+	 * 是否使用cglib进行代理，默认不开启
 	 */
 	boolean proxyTargetClass() default false;
 

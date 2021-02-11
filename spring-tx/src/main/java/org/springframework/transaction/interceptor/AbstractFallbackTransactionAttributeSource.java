@@ -108,6 +108,7 @@ public abstract class AbstractFallbackTransactionAttributeSource
 
 		// First, see if we have a cached value.
 		Object cacheKey = getCacheKey(method, targetClass);
+		// 缓存了@Transactional注解的信息
 		TransactionAttribute cached = this.attributeCache.get(cacheKey);
 		if (cached != null) {
 			// Value will either be canonical value indicating there is no transaction attribute,
@@ -121,6 +122,7 @@ public abstract class AbstractFallbackTransactionAttributeSource
 		}
 		else {
 			// We need to work it out.
+			// 获取@Transactional注解的信息
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
 			if (txAttr == null) {
@@ -164,6 +166,7 @@ public abstract class AbstractFallbackTransactionAttributeSource
 	@Nullable
 	protected TransactionAttribute computeTransactionAttribute(Method method, @Nullable Class<?> targetClass) {
 		// Don't allow no-public methods as required.
+		// allowPublicMethodsOnly默认为true，所以在非public方法上写的@Transactional注解没有作用
 		if (allowPublicMethodsOnly() && !Modifier.isPublic(method.getModifiers())) {
 			return null;
 		}
@@ -173,12 +176,14 @@ public abstract class AbstractFallbackTransactionAttributeSource
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
 		// First try is the method in the target class.
+		// 方法上@Transactional注解的信息
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
 		if (txAttr != null) {
 			return txAttr;
 		}
 
 		// Second try is the transaction attribute on the target class.
+		// 类上@Transactional注解的信息
 		txAttr = findTransactionAttribute(specificMethod.getDeclaringClass());
 		if (txAttr != null && ClassUtils.isUserLevelMethod(method)) {
 			return txAttr;

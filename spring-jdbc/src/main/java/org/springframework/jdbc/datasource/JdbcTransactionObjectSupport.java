@@ -188,6 +188,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	public void releaseSavepoint(Object savepoint) throws TransactionException {
 		ConnectionHolder conHolder = getConnectionHolderForSavepoint();
 		try {
+			// 对于Mysql是空实现，设置的Savepoint释放掉
 			conHolder.getConnection().releaseSavepoint((Savepoint) savepoint);
 		}
 		catch (Throwable ex) {

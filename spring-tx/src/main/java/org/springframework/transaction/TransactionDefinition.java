@@ -48,6 +48,8 @@ public interface TransactionDefinition {
 	 * Analogous to the EJB transaction attribute of the same name.
 	 * <p>This is typically the default setting of a transaction definition,
 	 * and typically defines a transaction synchronization scope.
+	 *
+	 * 如果当前存在事务，则加入当前事务，如果不存在当前事务，则创建一个新事务
 	 */
 	int PROPAGATION_REQUIRED = 0;
 
@@ -77,6 +79,8 @@ public interface TransactionDefinition {
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization within a {@code PROPAGATION_MANDATORY}
 	 * scope will always be driven by the surrounding transaction.
+	 *
+	 * 加入当前事务，如果当前没有事务则抛异常
 	 */
 	int PROPAGATION_MANDATORY = 2;
 
@@ -92,6 +96,8 @@ public interface TransactionDefinition {
 	 * transaction synchronizations. Existing synchronizations will be suspended
 	 * and resumed appropriately.
 	 * @see org.springframework.transaction.jta.JtaTransactionManager#setTransactionManager
+	 *
+	 * 创建一个新事务，如果存在当前事务，则把当前事务挂起，等新事务执行结束后，继续运行被挂起的事务
 	 */
 	int PROPAGATION_REQUIRES_NEW = 3;
 
@@ -107,6 +113,8 @@ public interface TransactionDefinition {
 	 * {@code PROPAGATION_NOT_SUPPORTED} scope. Existing synchronizations
 	 * will be suspended and resumed appropriately.
 	 * @see org.springframework.transaction.jta.JtaTransactionManager#setTransactionManager
+	 *
+	 * 如果当前存在事务，则把当前事务挂起，然后以非事务的方式运行
 	 */
 	int PROPAGATION_NOT_SUPPORTED = 4;
 
@@ -115,6 +123,8 @@ public interface TransactionDefinition {
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization is <i>not</i> available within a
 	 * {@code PROPAGATION_NEVER} scope.
+	 *
+	 * 不开启事务，如果存在当前事务，则抛异常
 	 */
 	int PROPAGATION_NEVER = 5;
 
@@ -128,6 +138,9 @@ public interface TransactionDefinition {
 	 * when working on a JDBC 3.0 driver. Some JTA providers might support
 	 * nested transactions as well.
 	 * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
+	 *
+	 * 和PROPAGATION_REQUIRED类似，如果当前存在事务，则加入当前事务，如果不存在当前事务，则创建一个新事务
+	 * 只不过它利用的是savepoint来达到在当前事务中运行的目的
 	 */
 	int PROPAGATION_NESTED = 6;
 

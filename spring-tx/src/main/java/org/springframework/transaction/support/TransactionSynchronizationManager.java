@@ -78,6 +78,7 @@ public abstract class TransactionSynchronizationManager {
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
+	/** key为datasource，value为某个数据库连接 */
 	private static final ThreadLocal<Map<Object, Object>> resources =
 			new NamedThreadLocal<>("Transactional resources");
 
@@ -150,6 +151,7 @@ public abstract class TransactionSynchronizationManager {
 	 */
 	@Nullable
 	private static Object doGetResource(Object actualKey) {
+		// resources是一个ThreadLocal，表示每个线程中缓存的某个DataSource对应的数据库连接
 		Map<Object, Object> map = resources.get();
 		if (map == null) {
 			return null;
