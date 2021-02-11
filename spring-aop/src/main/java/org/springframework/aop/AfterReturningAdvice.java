@@ -27,6 +27,8 @@ import org.springframework.lang.Nullable;
  * @author Rod Johnson
  * @see MethodBeforeAdvice
  * @see ThrowsAdvice
+ *
+ * 一个方法返回后执行，能拿到返回值，但是不能修改它(这是建议，没有进行控制，还是可以修改的)
  */
 public interface AfterReturningAdvice extends AfterAdvice {
 

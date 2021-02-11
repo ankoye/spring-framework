@@ -220,6 +220,8 @@ public abstract class AopUtils {
 	 * @param hasIntroductions whether or not the advisor chain
 	 * for this bean includes any introductions
 	 * @return whether the pointcut can apply on any method
+	 *
+	 * Advisor中的切点和当前targetClass是否匹配
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
@@ -244,6 +246,7 @@ public abstract class AopUtils {
 		}
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
+		// 遍历targetClass已经targetClass的父类和接口中的所有方法
 		for (Class<?> clazz : classes) {
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 			for (Method method : methods) {
@@ -314,6 +317,7 @@ public abstract class AopUtils {
 		}
 		boolean hasIntroductions = !eligibleAdvisors.isEmpty();
 		for (Advisor candidate : candidateAdvisors) {
+			// IntroductionAdvisor和@DeclareParents注解配合使用
 			if (candidate instanceof IntroductionAdvisor) {
 				// already processed
 				continue;
@@ -341,6 +345,7 @@ public abstract class AopUtils {
 		// Use reflection to invoke the method.
 		try {
 			ReflectionUtils.makeAccessible(method);
+			// 被代理对象执行方法，所以如果在这个流程中调用当前类中的其他方法，那么执行着都是被代理对象
 			return method.invoke(target, args);
 		}
 		catch (InvocationTargetException ex) {

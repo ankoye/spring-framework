@@ -97,6 +97,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
 
+		// 如果匹配，就会返回PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS，后续会对当前beanName进行代理
 		return (isSupportedBeanName(beanClass, beanName) ?
 				PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS : DO_NOT_PROXY);
 	}
