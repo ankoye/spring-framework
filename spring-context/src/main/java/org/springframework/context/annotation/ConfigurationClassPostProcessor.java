@@ -270,10 +270,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		if (!this.registriesPostProcessed.contains(factoryId)) {
 			// BeanDefinitionRegistryPostProcessor hook apparently not supported...
 			// Simply call processConfigurationClasses lazily at this point then.
+			// 扫描并解析Bean定义
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
 
-		// 判断是否需要对AppConfig类生成代理对象
+		// 判断是否需要对AppConfig类生成代理对象。
+		// 为什么需要代理：获取Bean时先去容器获取，防止创建多个Bean
 		enhanceConfigurationClasses(beanFactory);
 		// Bean的后置处理器
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
@@ -452,7 +454,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			return;
 		}
 
-		// 生成AppConfig的代理对象
+		// 使用cglib生成AppConfig的代理对象
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer();
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();

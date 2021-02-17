@@ -91,9 +91,9 @@ public class AnnotatedBeanDefinitionReader {
 		this.registry = registry;
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
 		// 生成并注册5个BeanDefinition
-		// 1.ConfigurationClassPostProcessor
-		// 2.AutowiredAnnotationBeanPostProcessor
-		// 3.CommonAnnotationBeanPostProcessor
+		// 1.ConfigurationClassPostProcessor，用来解析配置类生成BeanDefinition
+		// 2.AutowiredAnnotationBeanPostProcessor，用来处理@Autowired
+		// 3.CommonAnnotationBeanPostProcessor，用来处理@Resource、@Inject
 		// 4.EventListenerMethodProcessor
 		// 5.DefaultEventListenerFactory
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
