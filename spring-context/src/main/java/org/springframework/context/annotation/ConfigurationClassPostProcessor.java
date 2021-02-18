@@ -365,6 +365,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 			// 利用reader解析ConfigurationClass，同时注册BeanDefinition
 			this.reader.loadBeanDefinitions(configClasses);
+			// 加入到已解析集合
 			alreadyParsed.addAll(configClasses);
 			processConfig.tag("classCount", () -> String.valueOf(configClasses.size())).end();
 

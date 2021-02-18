@@ -46,7 +46,7 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 	 */
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
-		// AnnotationTransactionAttributeSource
+		// AnnotationTransactionAttributeSource，由ProxyTransactionManagementConfiguration注册
 		TransactionAttributeSource tas = getTransactionAttributeSource();
 		// 某个类或方法上是否存在@Transactional注解
 		// 调用AnnotationTransactionAttributeSource的父类中的getTransactionAttribute()方法

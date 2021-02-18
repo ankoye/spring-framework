@@ -383,7 +383,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 
 		if (txAttr == null || !(ptm instanceof CallbackPreferringPlatformTransactionManager)) {
 			// Standard transaction demarcation with getTransaction and commit/rollback calls.
-			// 创建事务，并得到事务信息，后面需要事务信息用来进行提交或回滚
+			// 如果有必要创建事务，并得到事务信息，后面需要事务信息用来进行提交或回滚
 			TransactionInfo txInfo = createTransactionIfNecessary(ptm, txAttr, joinpointIdentification);
 
 			Object retVal;

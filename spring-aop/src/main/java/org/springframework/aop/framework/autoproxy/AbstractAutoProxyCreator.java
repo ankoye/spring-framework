@@ -254,11 +254,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
-			// advisedBeans中存的是当前这个bean需不需要代理
+			// 被解析过，直接返回
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			// 当前bean是不是不需要进行代理
+			// 判断是不是基础Bean || 判断是不是应该跳过
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -302,8 +302,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
-			// earlyProxyReferences中存的是哪些提前进行了AOP的bean，beanName:AOP之前的对象
-			// 注意earlyProxyReferences中并没有存AOP之后的代理对象  BeanPostProcessor
+			// 之前循环依赖创建的动态代理，如果是现在的bean就不再创建
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
 				// 没有提前进行过AOP，则进行AOP
 				return wrapIfNecessary(bean, beanName, cacheKey);
@@ -347,7 +346,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
-		// 当前这个bean不用被代理
+		// advisedBeans bean不用被代理
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
@@ -388,6 +387,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @see #shouldSkip
 	 */
 	protected boolean isInfrastructureClass(Class<?> beanClass) {
+		// 如果是Advice等类，直接跳过
 		boolean retVal = Advice.class.isAssignableFrom(beanClass) ||
 				Pointcut.class.isAssignableFrom(beanClass) ||
 				Advisor.class.isAssignableFrom(beanClass) ||
@@ -464,7 +464,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
 		}
-
+		// 创建代理工厂
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// 复制配置参数
 		proxyFactory.copyFrom(this);

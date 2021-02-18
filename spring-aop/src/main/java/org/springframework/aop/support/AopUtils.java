@@ -225,6 +225,7 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
+		// 初筛，进行类级别过滤
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
@@ -252,6 +253,7 @@ public abstract class AopUtils {
 			for (Method method : methods) {
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+						// 通过方法匹配器进行匹配，内置aop接口方式
 						methodMatcher.matches(method, targetClass)) {
 					return true;
 				}
@@ -322,6 +324,7 @@ public abstract class AopUtils {
 				// already processed
 				continue;
 			}
+			// 真正过滤
 			if (canApply(candidate, clazz, hasIntroductions)) {
 				eligibleAdvisors.add(candidate);
 			}

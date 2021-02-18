@@ -346,14 +346,15 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		// 表示一个事务的定义，通过@Transactional注解也就是在定义一个事务
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
-		// 获取一个事务对象，每次都会生成一个DataSourceTransactionObject，而重点是这个对象中是否已经存在一个数据库连接
+		// 获取一个事务对象，每次都会生成一个DataSourceTransactionObject
+		// 而重点是这个对象中是否已经存在一个数据库连接
 		Object transaction = doGetTransaction();
 		boolean debugEnabled = logger.isDebugEnabled();
 
-		// 如果已经存在一个数据库连接，表示当前线程已经存在一个事务
+		// 如果已经存在一个数据库连接，表示当前线程已经存在一个事务（嵌套事务）
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
-			// 存在事务的情况下，按不同的传播级别进行处理
+			// 处理嵌套事务，按不同的传播级别进行处理
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
@@ -362,6 +363,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		if (def.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
 			throw new InvalidTimeoutException("Invalid transaction timeout", def.getTimeout());
 		}
+
+		/// 处理传播行为
 
 		// No existing transaction found -> check propagation behavior to find out how to proceed.
 		// 当前线程还不存在事务
@@ -378,6 +381,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				logger.debug("Creating new transaction with name [" + def.getName() + "]: " + def);
 			}
 			try {
+				// 开启事务
 				return startTransaction(def, transaction, debugEnabled, suspendedResources);
 			}
 			catch (RuntimeException | Error ex) {
@@ -402,7 +406,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	private TransactionStatus startTransaction(TransactionDefinition definition, Object transaction,
 			boolean debugEnabled, @Nullable SuspendedResourcesHolder suspendedResources) {
-
+		// 是不是一个新事务
 		boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 		// 事务对象中包括：
 		// 1. 事务的定义
@@ -441,6 +445,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 					definition, null, false, newSynchronization, debugEnabled, suspendedResources);
 		}
 
+		// 存在外部事务：挂起外部事务，创建新事务
 		if (definition.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW) {
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction, creating new transaction with name [" +
@@ -547,11 +552,15 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	protected void prepareSynchronization(DefaultTransactionStatus status, TransactionDefinition definition) {
 		if (status.isNewSynchronization()) {
+			// 事务的几个
 			TransactionSynchronizationManager.setActualTransactionActive(status.hasTransaction());
+			// 当前事务的隔离级别
 			TransactionSynchronizationManager.setCurrentTransactionIsolationLevel(
 					definition.getIsolationLevel() != TransactionDefinition.ISOLATION_DEFAULT ?
 							definition.getIsolationLevel() : null);
+			// 是否为只读事务
 			TransactionSynchronizationManager.setCurrentTransactionReadOnly(definition.isReadOnly());
+			// 事务的名称
 			TransactionSynchronizationManager.setCurrentTransactionName(definition.getName());
 			TransactionSynchronizationManager.initSynchronization();
 		}
@@ -598,12 +607,19 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				}
 				// 再把线程中记录的之前事务的信息清空，并记录到SuspendedResourcesHolder中
 				String name = TransactionSynchronizationManager.getCurrentTransactionName();
+				// 清空线程变量
 				TransactionSynchronizationManager.setCurrentTransactionName(null);
+				// 获取出只读事务的名称
 				boolean readOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
+				// 情空线程变量
 				TransactionSynchronizationManager.setCurrentTransactionReadOnly(false);
+				// 获取已存在的事务的隔离级别
 				Integer isolationLevel = TransactionSynchronizationManager.getCurrentTransactionIsolationLevel();
+				// 清空隔离级别
 				TransactionSynchronizationManager.setCurrentTransactionIsolationLevel(null);
+				// 获取激活标志
 				boolean wasActive = TransactionSynchronizationManager.isActualTransactionActive();
+				// 清空标志
 				TransactionSynchronizationManager.setActualTransactionActive(false);
 
 				// 把当前挂起的事务的所有信息全部存在SuspendedResourcesHolder中

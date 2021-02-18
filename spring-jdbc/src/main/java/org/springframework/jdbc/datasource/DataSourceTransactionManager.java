@@ -274,7 +274,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
-				// 设置为newConnectionHolder为true
+				// 把数据库连接连接包装成ConnectionHolder对象，然后设置到txObject对象中去
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
