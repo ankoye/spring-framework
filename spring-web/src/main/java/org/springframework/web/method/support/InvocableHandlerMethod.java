@@ -188,12 +188,14 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 */
 	@Nullable
 	protected Object doInvoke(Object... args) throws Exception {
+		// 获取到正在执行的方法
 		Method method = getBridgedMethod();
 		ReflectionUtils.makeAccessible(method);
 		try {
 			if (KotlinDetector.isSuspendingFunction(method)) {
 				return CoroutinesUtils.invokeSuspendingFunction(method, getBean(), args);
 			}
+			// 调用
 			return method.invoke(getBean(), args);
 		}
 		catch (IllegalArgumentException ex) {
