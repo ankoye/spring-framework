@@ -563,7 +563,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Prepare the bean factory for use in this context.
 			// 准备BeanFactory
 			// 1. 设置BeanFactory的类加载器、表达式解析器、类型转化注册器
-			// 2. 添加三个BeanPostProcessor，注意是具体的BeanPostProcessor实例对象
+			// 2. 添加三个BeanPostProcessor实例对象
 			// 3. 记录ignoreDependencyInterface
 			// 4. 记录ResolvableDependency
 			// 5. 添加三个单例Bean
@@ -701,8 +701,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
-		// 两个模板，子类负责实现，
-		// xml-> AbstractRefreshableApplicationContext支持刷新
+		// 两个模板，子类负责实现
+		// xml-> AbstractRefreshableApplicationContext支持刷新，加载BeanDefinition
 		// 配置类 -> GenericApplicationContext不支持刷新
 		refreshBeanFactory();
 		return getBeanFactory();
@@ -852,6 +852,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
+			// 创建事件多播器
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isTraceEnabled()) {

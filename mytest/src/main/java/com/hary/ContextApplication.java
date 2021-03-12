@@ -1,6 +1,6 @@
-package com.hary.context;
+package com.hary;
 
-import com.hary.model.User;
+import com.hary.context.User;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

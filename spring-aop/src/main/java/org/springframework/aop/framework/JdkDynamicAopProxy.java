@@ -192,7 +192,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			//  advised就是ProxyFactory
 			if (this.advised.exposeProxy) {
 				// Make invocation available if necessary.
-				/** 设置到ThreadLocal对象，在调用其他方法时就不会再触发代理 */
+				// 保存到ThreadLocal对象
 				oldProxy = AopContext.setCurrentProxy(proxy);
 				setProxyContext = true;
 			}

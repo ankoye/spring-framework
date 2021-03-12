@@ -354,7 +354,6 @@ final class PostProcessorRegistrationDelegate {
 		for (BeanFactoryPostProcessor postProcessor : postProcessors) {
 			StartupStep postProcessBeanFactory = beanFactory.getApplicationStartup().start("spring.context.bean-factory.post-process")
 					.tag("postProcessor", postProcessor::toString);
-			// ConfigurationClassPostProcessor
 			postProcessor.postProcessBeanFactory(beanFactory);
 			postProcessBeanFactory.end();
 		}

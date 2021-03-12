@@ -1254,6 +1254,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Candidate constructors for autowiring?
+		// 指定构造函数
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		// 通过BeanPostProcessor找出了构造方法
 		// 或者BeanDefinition的autowire属性为AUTOWIRE_CONSTRUCTOR

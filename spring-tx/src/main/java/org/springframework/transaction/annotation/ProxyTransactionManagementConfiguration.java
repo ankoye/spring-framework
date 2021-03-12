@@ -39,6 +39,12 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class ProxyTransactionManagementConfiguration extends AbstractTransactionManagementConfiguration {
 
+	/**
+	 * 注册一个解析事务的Advisor
+	 * @param transactionAttributeSource 解析@Transaction的pointcut
+	 * @param transactionInterceptor 用于代理方法
+	 * @return
+	 */
 	@Bean(name = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public BeanFactoryTransactionAttributeSourceAdvisor transactionAdvisor(

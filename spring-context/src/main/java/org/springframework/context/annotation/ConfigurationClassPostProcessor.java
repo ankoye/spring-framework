@@ -297,10 +297,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					logger.debug("Bean definition has already been processed as a configuration class: " + beanDef);
 				}
 			}
-			// 检查BeanDefinition是不是配置类候选者，那么什么样的BeanDefinition符合呢？
-			// 1. 存在@Configuration的就是配置类，或者
-			// 2. 存在@Component，@ComponentScan，@Import，@ImportResource，或者
-			// 3. 存在@Bean标注的方法
+			/// 1. 选择需要满足一下条件的类候选者BeanDefinition，
+			// 存在@Configuration的就是配置类，或者
+			// 存在@Component，@ComponentScan，@Import，@ImportResource，或者
+			// 存在@Bean标注的方法
 			else if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
@@ -350,7 +350,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
-			// 对配置BeanDefinition进行解析，解析完后会生成ConfigurationClass
+			/// 2. 对配置BeanDefinition进行解析，解析完后会生成ConfigurationClass
 			parser.parse(candidates);
 			parser.validate();
 
