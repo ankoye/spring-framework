@@ -269,14 +269,19 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	@Override
 	@Nullable
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+		// 处理方法级别的 @RequestMapping
 		RequestMappingInfo info = createRequestMappingInfo(method);
 		if (info != null) {
+			// 处理类级别的 @RequestMapping
 			RequestMappingInfo typeInfo = createRequestMappingInfo(handlerType);
 			if (typeInfo != null) {
+				// 如果存在类级别的 @RequestMapping 则将其与方法级别的映射关系进行组合（将所有对应的属性进行拼接）
 				info = typeInfo.combine(info);
 			}
+			// 获取路径前缀
 			String prefix = getPathPrefix(handlerType);
 			if (prefix != null) {
+				// 如果存在路径前缀则进行再一次的拼接操作
 				info = RequestMappingInfo.paths(prefix).options(this.config).build().combine(info);
 			}
 		}
@@ -306,9 +311,12 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	 */
 	@Nullable
 	private RequestMappingInfo createRequestMappingInfo(AnnotatedElement element) {
+		// 获取请求映射关系（获取 @RequestMapping 注解）
 		RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(element, RequestMapping.class);
+		// 根据传入的是类还是方法调用不同的自定义方法来进行处理（默认返回 null）
 		RequestCondition<?> condition = (element instanceof Class ?
 				getCustomTypeCondition((Class<?>) element) : getCustomMethodCondition((Method) element));
+		// 如果获取到的请求映射不为空则创建一个 MappingInfo 包装类
 		return (requestMapping != null ? createRequestMappingInfo(requestMapping, condition) : null);
 	}
 
